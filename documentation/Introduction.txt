@@ -1,0 +1,92 @@
+AION Decision & Strategy Lab
+
+1. Real-World AI: Disaster Response System
+The system questions such as: Given the current disaster situation, what should responders prioritize and why?
+
+It will consider:
+- Disaster Type
+- Affected zones
+- Population
+- High risk/ medical patients
+- Shelters
+- Hospitals
+- Ambulances
+- Food Water Resources
+- Road Conditions
+- Blocked Roads
+- Distances
+- Resource Availability
+
+It will produce decisions scuh as:
+
+Priority 1 :
+Evacuate high risk medical patients
+Priority 2:
+Route Civilians to shelter 8
+Priority 3:
+Deploy ambulances 3,7 and 11
+Priority 4:
+Allocate water resources to zone 4
+
+It will also provide an explanation/ rule trace
+
+Medical Urgency --> High
+Population Risk --> High
+Shelter Capacity --> Available
+Road Accessibility --> Available
+Distance --> Low
+
+Therefore:
+Zone 4 recieves highest evacuation Priority
+
+Classical AI Demonstrated:
+- Prolog
+- Facts
+- Rules
+- Inference
+- Knowledge Representation
+- Search
+- Explainable Reasoning
+
+2. Disaster Rescue Game
+
+Interactice Strategy Game
+The environment can contain:
+- Civilians
+- Hospitals
+- Shelters
+- Fires
+- Flooded Cells
+- Blocked Roads
+- Emergency Vehicles
+- Resources
+- Obstacles
+- Risk zones
+
+AI Algorithms
+
+BFS/A* : Used for navigation and path finding
+
+Heuristic function: H(s) = w1(people rescued) - w2(distance) - w3(risk) + w4(resources)
+
+Minimax: For starategic decision making against human player
+
+Aplha-Beta Pruning: To reduce unnecessary game tree exploration
+
+**** Frozen Core Features:
+
+EXPERT SYSTEM
+Disaster Scenario Creation, Multiple Disaster Types, Disaster Zones, Population Information,
+Medical/High Risk population, Shelters, Hospitals, Ambulances, Food/Water Resources,
+Road conditions, Blocked Roads, Prolog Facts, Prolog Rules, Inference engine, Search, 
+Priority Recommendations, Resource alocation and explanaible rule trace.
+
+RESCUE GRID:
+Interactive disaster grid, human player, ai opponent, Civilians, rescue locations,
+Obstacles, Dynamic hazards, BFS, A*, Heuristic evaluation, Minimax, Alpha-Beta Pruning,
+difficuty levels, rescue scoring, ai decision explanations.
+
+AION PLATFORM
+Professional Homepage, Expert System Interface, RescueGrid Interface, Shared Disaster-World Model,
+Search Visualization, Rule-trace Visualization, Heuristic Visualization, Game-Tree Visualization,
+Alpha-Beta Pruning Visualization, AI Decision explanation, Performance statistics.

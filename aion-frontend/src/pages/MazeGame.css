@@ -1,0 +1,908 @@
+/* =========================================================
+   AION — DISASTER RESCUE STRATEGY
+   Problem Statement 2
+   Consistent AION System Design
+   ========================================================= */
+
+* {
+  box-sizing: border-box;
+}
+
+.maze-game-page,
+.maze-game-page * {
+  box-sizing: border-box;
+}
+
+.maze-game-page {
+  width: 100%;
+  min-height: 100vh;
+  padding: 32px 42px 55px;
+  background: #f5f6f8;
+  color: #17191c;
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.maze-header {
+  max-width: 1380px;
+  margin: 0 auto 28px;
+}
+
+.maze-eyebrow {
+  margin-bottom: 7px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #73777d;
+}
+
+.maze-header h1 {
+  margin: 0;
+  font-size: 32px;
+  line-height: 1.15;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #17191c;
+}
+
+.maze-header p {
+  margin: 8px 0 0;
+  color: #73777d;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+
+/* =========================================================
+   PAGE WRAPPER
+   ========================================================= */
+
+.wrap {
+  width: 100%;
+  max-width: 1380px;
+  margin: 0 auto;
+}
+
+
+/* =========================================================
+   GAME STATUS / RESULT BANNER
+   ========================================================= */
+
+.banner {
+  margin-bottom: 22px;
+  padding: 18px 20px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  background: #ffffff;
+  border: 1px solid #e2e4e7;
+  border-radius: 10px;
+
+  font-size: 14px;
+  font-weight: 750;
+  color: #17191c;
+
+  box-shadow: 0 5px 18px rgba(15, 23, 42, 0.04);
+}
+
+.banner-ai {
+  border-left: 4px solid #3b82a0;
+}
+
+.banner-human {
+  border-left: 4px solid #3f7f55;
+}
+
+.banner-draw {
+  border-left: 4px solid #d4a72c;
+}
+
+.banner button {
+  padding: 9px 15px;
+
+  border: 1px solid #d7dade;
+  border-radius: 7px;
+
+  background: #17191c;
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    transform 0.15s ease;
+}
+
+.banner button:hover {
+  background: #30343a;
+  transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   MAIN TWO-COLUMN LAYOUT
+   ========================================================= */
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(300px, 0.75fr);
+  gap: 22px;
+  align-items: start;
+}
+
+
+/* =========================================================
+   GENERIC PANEL
+   Used by ScorePanel, Controls, TelemetryPanel, EventLog
+   ========================================================= */
+
+.panel {
+  margin-bottom: 14px;
+  padding: 20px;
+
+  background: #ffffff;
+  border: 1px solid #e2e4e7;
+  border-radius: 10px;
+
+  box-shadow: 0 5px 18px rgba(15, 23, 42, 0.04);
+}
+
+.panel h3 {
+  margin: 0 0 17px;
+
+  font-size: 16px;
+  font-weight: 750;
+  letter-spacing: -0.01em;
+
+  color: #17191c;
+}
+
+
+/* =========================================================
+   SCORE PANEL
+   ========================================================= */
+
+.score-row {
+  min-height: 50px;
+  padding: 10px 12px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  background: #f8f9fa;
+  border: 1px solid #e5e7ea;
+  border-radius: 8px;
+
+  margin-bottom: 8px;
+}
+
+.score-row:last-child {
+  margin-bottom: 0;
+}
+
+.score-row span {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.score-row b {
+  font-size: 22px;
+  font-weight: 800;
+  color: #17191c;
+}
+
+.human-label {
+  color: #3f7f55;
+}
+
+.ai-label {
+  color: #3b82a0;
+}
+
+
+/* =========================================================
+   BOARD PANEL
+   ========================================================= */
+
+.board {
+  width: min(100%, 680px);
+  aspect-ratio: 1 / 1;
+
+  margin: 0 auto;
+
+  display: grid;
+
+  border: 2px solid #cbd5e1;
+  border-radius: 12px;
+
+  overflow: hidden;
+
+  background: #e2e8f0;
+
+  box-shadow: 0 8px 25px rgba(15, 23, 42, 0.06);
+}
+
+
+/* =========================================================
+   BOARD CELLS
+   ========================================================= */
+
+.cell {
+  min-width: 0;
+  min-height: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  position: relative;
+
+  font-size: clamp(9px, 1.5vw, 17px);
+  font-weight: 700;
+
+  border-right: 1px solid rgba(148, 163, 184, 0.22);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.22);
+
+  user-select: none;
+
+  transition:
+    background 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+
+/* Normal traversable cell */
+
+.cell.empty {
+  background: #f8fafc;
+}
+
+
+/* =========================================================
+   WALL
+   ========================================================= */
+
+.cell.wall {
+  background: #334155;
+  color: #ffffff;
+}
+
+
+/* =========================================================
+   HAZARD
+   ========================================================= */
+
+.cell.hazard {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+
+/* =========================================================
+   CIVILIAN
+   ========================================================= */
+
+.cell.civilian {
+  background: #fef9c3;
+  color: #854d0e;
+}
+
+
+/* =========================================================
+   SAFE POINT
+   ========================================================= */
+
+.cell.safe {
+  background: #dcfce7;
+  color: #166534;
+}
+
+
+/* =========================================================
+   EVACUATION POINT
+   ========================================================= */
+
+.cell.evac {
+  background: #cc5500;
+  color: #92400e;
+}
+
+
+/* =========================================================
+   PLAYER TOKENS
+   ========================================================= */
+
+.token {
+  width: 70%;
+  height: 70%;
+  min-width: 22px;
+  min-height: 22px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 8px;
+
+  font-size: clamp(8px, 1.2vw, 13px);
+  font-weight: 800;
+
+  position: relative;
+  z-index: 5;
+
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.12);
+}
+
+
+/* Human */
+
+.token.human {
+  background: #3f7f55;
+  color: #ffffff;
+
+  border: 2px solid #2f6541;
+}
+
+
+/* AI */
+
+.token.ai {
+  background: #3b82a0;
+  color: #ffffff;
+
+  border: 2px solid #2d6d88;
+}
+
+
+/* Both players */
+
+.token.both {
+  background: #334155;
+  color: #ffffff;
+
+  border: 2px solid #1e293b;
+
+  font-size: clamp(7px, 1vw, 11px);
+}
+
+
+/* =========================================================
+   LEGEND
+   ========================================================= */
+
+.legend {
+  width: min(100%, 680px);
+
+  margin: 12px auto 0;
+
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px 12px;
+}
+
+.legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 6px 9px;
+
+  background: #ffffff;
+  border: 1px solid #e5e7ea;
+  border-radius: 6px;
+
+  font-size: 10px;
+  font-weight: 650;
+  color: #555a61;
+}
+
+.sw {
+  width: 10px;
+  height: 10px;
+
+  display: inline-block;
+
+  border-radius: 3px;
+
+  border: 1px solid rgba(15, 23, 42, 0.12);
+}
+
+.sw-wall {
+  background: #334155;
+}
+
+.sw-hazard {
+  background: #fee2e2;
+}
+
+.sw-civilian {
+  background: #fef9c3;
+}
+
+.sw-safe {
+  background: #dcfce7;
+}
+
+.sw-evac {
+  background: #cc5500;
+}
+
+.sw-human {
+  background: #3f7f55;
+}
+
+.sw-ai {
+  background: #3b82a0;
+}
+
+
+/* =========================================================
+   MOVEMENT CONTROLS
+   ========================================================= */
+
+.controls {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 7px;
+
+  max-width: 210px;
+  margin: 8px auto 0;
+}
+
+.controls button {
+  width: 100%;
+  height: 42px;
+
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+
+  background: #f8fafc;
+  color: #0f172a;
+
+  font-size: 17px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.controls button:hover:not(:disabled) {
+  background: #eef2f7;
+  border-color: #94a3b8;
+  transform: translateY(-1px);
+}
+
+.controls button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.controls button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+
+/* WAIT / HOLD */
+
+.controls .wide {
+  grid-column: 1 / -1;
+
+  height: 42px;
+
+  margin-top: 4px;
+
+  background: #17191c;
+  border-color: #17191c;
+  color: #ffffff;
+
+  font-size: 12px;
+  letter-spacing: 0.02em;
+}
+
+.controls .wide:hover:not(:disabled) {
+  background: #30343a;
+  border-color: #30343a;
+}
+
+
+/* =========================================================
+   CONTROL HINT
+   ========================================================= */
+
+.hint {
+  margin-top: 14px;
+
+  text-align: center;
+
+  font-size: 11px;
+  line-height: 1.55;
+
+  color: #73777d;
+}
+
+
+/* =========================================================
+   TELEMETRY
+   ========================================================= */
+
+.stat {
+  min-height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+
+  padding: 8px 0;
+
+  border-bottom: 1px solid #edf0f2;
+}
+
+.stat:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.stat span {
+  font-size: 11px;
+  font-weight: 600;
+  color: #73777d;
+}
+
+.stat b {
+  max-width: 58%;
+
+  text-align: right;
+
+  font-size: 12px;
+  font-weight: 750;
+
+  color: #30343a;
+
+  overflow-wrap: anywhere;
+}
+
+
+/* =========================================================
+   EVENT LOG
+   ========================================================= */
+
+.event-log {
+  margin-bottom: 14px;
+}
+
+.event-log-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 14px;
+}
+
+.event-log-header h3 {
+  margin: 0;
+
+  font-size: 16px;
+  font-weight: 750;
+}
+
+.event-log-header p {
+  margin: 4px 0 0;
+
+  font-size: 11px;
+  color: #73777d;
+}
+
+.event-count {
+  min-width: 28px;
+  height: 24px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 8px;
+
+  background: #f5f6f8;
+  border: 1px solid #e5e7ea;
+  border-radius: 6px;
+
+  font-size: 11px;
+  font-weight: 750;
+  color: #555a61;
+}
+
+.event-log-list {
+  max-height: 235px;
+
+  overflow-y: auto;
+
+  padding-right: 3px;
+}
+
+
+/* Scrollbar */
+
+.event-log-list::-webkit-scrollbar {
+  width: 5px;
+}
+
+.event-log-list::-webkit-scrollbar-track {
+  background: #f5f6f8;
+}
+
+.event-log-list::-webkit-scrollbar-thumb {
+  background: #cbd0d5;
+  border-radius: 10px;
+}
+
+
+/* Event item */
+
+.event-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+
+  padding: 9px 0;
+
+  border-bottom: 1px solid #edf0f2;
+}
+
+.event-item:last-child {
+  border-bottom: 0;
+}
+
+.event-dot {
+  width: 7px;
+  height: 7px;
+
+  flex: 0 0 7px;
+
+  margin-top: 5px;
+
+  border-radius: 50%;
+
+  background: #8a8e94;
+}
+
+.event-message {
+  font-size: 11px;
+  line-height: 1.55;
+  color: #555a61;
+}
+
+
+/* Different event types if supplied */
+
+.event-ai .event-dot {
+  background: #3b82a0;
+}
+
+.event-human .event-dot {
+  background: #3f7f55;
+}
+
+.event-hazard .event-dot {
+  background: #b42318;
+}
+
+.event-rescue .event-dot {
+  background: #d4a72c;
+}
+
+.event-system .event-dot {
+  background: #73777d;
+}
+
+
+/* Empty state */
+
+.event-empty {
+  padding: 22px 10px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+
+  color: #8a8e94;
+
+  font-size: 11px;
+}
+
+.event-empty-icon {
+  font-size: 20px;
+  color: #b4b8bd;
+}
+
+
+/* =========================================================
+   LEFT BOARD SECTION
+   ========================================================= */
+
+.layout > div:first-child {
+  min-width: 0;
+}
+
+
+/* =========================================================
+   RIGHT PANEL SECTION
+   ========================================================= */
+
+.layout > div:last-child {
+  min-width: 0;
+}
+
+
+/* =========================================================
+   RESPONSIVE — TABLET
+   ========================================================= */
+
+@media (max-width: 1050px) {
+  .maze-game-page {
+    padding: 26px 24px 45px;
+  }
+
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .board {
+    width: min(100%, 650px);
+  }
+
+  .legend {
+    width: min(100%, 650px);
+  }
+
+  .layout > div:last-child {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    align-items: start;
+  }
+
+  .layout > div:last-child .panel {
+    margin-bottom: 0;
+  }
+}
+
+
+/* =========================================================
+   RESPONSIVE — MOBILE
+   ========================================================= */
+
+@media (max-width: 700px) {
+  .maze-game-page {
+    padding: 22px 16px 38px;
+  }
+
+  .maze-header h1 {
+    font-size: 27px;
+  }
+
+  .maze-header p {
+    font-size: 13px;
+  }
+
+  .layout > div:last-child {
+    display: block;
+  }
+
+  .panel {
+    padding: 17px;
+  }
+
+  .board {
+    width: 100%;
+    border-radius: 9px;
+  }
+
+  .cell {
+    font-size: 10px;
+  }
+
+  .token {
+    min-width: 18px;
+    min-height: 18px;
+    border-radius: 6px;
+  }
+
+  .legend {
+    gap: 6px;
+  }
+
+  .legend span {
+    font-size: 9px;
+    padding: 5px 7px;
+  }
+
+  .banner {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .banner button {
+    margin-left: 0 !important;
+  }
+}
+
+
+/* =========================================================
+   RESPONSIVE — SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 480px) {
+  .maze-game-page {
+    padding: 18px 10px 32px;
+  }
+
+  .maze-header h1 {
+    font-size: 23px;
+  }
+
+  .maze-header p {
+    font-size: 12px;
+  }
+
+  .panel {
+    padding: 15px;
+    border-radius: 9px;
+  }
+
+  .board {
+    border-width: 1px;
+  }
+
+  .cell {
+    font-size: 8px;
+  }
+
+  .token {
+    min-width: 15px;
+    min-height: 15px;
+    border-radius: 5px;
+    font-size: 8px;
+  }
+
+  .score-row b {
+    font-size: 20px;
+  }
+
+  .stat {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .stat b {
+    max-width: 100%;
+    text-align: left;
+  }
+
+  .controls {
+    max-width: 190px;
+  }
+}
