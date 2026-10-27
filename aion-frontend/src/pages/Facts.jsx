@@ -158,7 +158,7 @@ function FactsContent({ facts }) {
           to check the dashboard results.
         </p>
         <p className="muted-text">
-          {show(scenario.name)} (version {show(scenario.version)}). {show(scenario.description)}
+          {show(scenario.name)} {show(scenario.description)}
         </p>
         <p className="muted-text">
           This page is read-only. Hospital beds and shelter places are the starting values
