@@ -132,6 +132,10 @@ def get_system() -> Any:
     return run_goal("aion_system_json")
 
 
+def get_facts() -> Any:
+    return run_goal("aion_facts_json")
+
+
 def get_health() -> Any:
     return run_goal("aion_health_check")
 

@@ -80,6 +80,7 @@ async function fetchJson(endpoint, { signal } = {}) {
 
 export const getPlan = (options) => fetchJson('/api/plan', options)
 export const getSystem = (options) => fetchJson('/api/system', options)
+export const getFacts = (options) => fetchJson('/api/facts', options)
 export const getHealth = (options) => fetchJson('/api/health', options)
 export const getZone = (zone, options) =>
   fetchJson(`/api/zone/${encodeURIComponent(zone)}`, options)

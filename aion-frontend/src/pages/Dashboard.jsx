@@ -11,7 +11,7 @@ function loadDashboard(signal) {
   return Promise.all([getPlan({ signal }), getSystem({ signal })])
 }
 
-function Dashboard({ onZoneSelect, onBack }) {
+function Dashboard({ onZoneSelect, onBack, onOpenFacts }) {
   const { data, error, loading, reload } = useAsync(loadDashboard, [])
 
   const status = error ? 'offline' : loading ? 'checking' : 'online'
@@ -42,13 +42,18 @@ function Dashboard({ onZoneSelect, onBack }) {
           />
         )}
 
-        {data && <DashboardContent plan={plan} system={system} onZoneSelect={onZoneSelect} />}
+        {data && <DashboardContent
+            plan={plan}
+            system={system}
+            onZoneSelect={onZoneSelect}
+            onOpenFacts={onOpenFacts}
+          />}
       </main>
     </div>
   )
 }
 
-function DashboardContent({ plan, system, onZoneSelect }) {
+function DashboardContent({ plan, system, onZoneSelect, onOpenFacts }) {
   const zones = plan?.plan ?? []
   const metrics = system?.metrics ?? {}
   const disaster = system?.disaster ?? {}
@@ -66,6 +71,10 @@ function DashboardContent({ plan, system, onZoneSelect }) {
           <h1>Emergency Response Overview</h1>
 
           <p>Response priorities and resource decisions derived by the Prolog reasoning engine.</p>
+
+          <button type="button" className="text-link" onClick={onOpenFacts}>
+            View the facts behind these results
+          </button>
         </div>
 
         <div className="zone-count">

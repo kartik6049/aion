@@ -4,6 +4,7 @@ import Home from './pages/Home'
 import Dashboard from './pages/Dashboard'
 import ZoneDetails from './pages/ZoneDetails'
 import GameLab from './pages/GameLab'
+import Facts from './pages/Facts'
 
 function App() {
   const [route, navigate] = useHashRoute()
@@ -11,6 +12,9 @@ function App() {
   switch (route.page) {
     case 'game':
       return <GameLab onBack={() => navigate({ page: 'home' })} />
+
+    case 'facts':
+      return <Facts onBack={() => navigate({ page: 'dashboard' })} />
 
     case 'zone':
       return (
@@ -25,6 +29,7 @@ function App() {
         <Dashboard
           onBack={() => navigate({ page: 'home' })}
           onZoneSelect={(zone) => navigate({ page: 'zone', zone })}
+          onOpenFacts={() => navigate({ page: 'facts' })}
         />
       )
 

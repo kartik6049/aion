@@ -88,6 +88,7 @@ npm run lint && npm run build
 | `GET /api/plan` | compact plan, one entry per zone, highest priority first |
 | `GET /api/zone/{zone}` | decision + explanation for one zone (404 unknown, 400 invalid name) |
 | `GET /api/system` | disaster, metrics, shortages, resource inventory |
+| `GET /api/facts` | the input facts from facts.pl (zones, hospitals, shelters, ambulances, roads), read-only |
 | `GET /api/resources` | per-zone allocation overview |
 
 Engine failures return `503` with a generic message; details go to the server log.

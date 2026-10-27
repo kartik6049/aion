@@ -7,6 +7,7 @@ export function parseHash(hash) {
   const parts = path.split('/').filter(Boolean)
 
   if (parts[0] === 'game') return { page: 'game' }
+  if (parts[0] === 'facts') return { page: 'facts' }
 
   if (parts[0] === 'dashboard') {
     if (parts[1] === 'zone' && parts[2]) {
@@ -26,6 +27,8 @@ export function formatHash(route) {
   switch (route.page) {
     case 'game':
       return '#/game'
+    case 'facts':
+      return '#/facts'
     case 'dashboard':
       return '#/dashboard'
     case 'zone':

@@ -1228,3 +1228,134 @@ aion_health_check :-
             zones_loaded:ZoneCount
         }
     ).
+% ============================================================
+% FACTS JSON (read-only view of the input facts)
+% ============================================================
+% Prints the facts the engine reasons over, exactly as stored in facts.pl,
+% so that people can check them against the decisions. Nothing here is
+% derived or computed beyond looking facts up.
+
+aion_facts_json :-
+    findall(Z, zone(Z), ZoneNames),
+    findall(ZoneJSON, (member(Z, ZoneNames), facts_zone_json(Z, ZoneJSON)), Zones),
+    findall(H, facts_hospital_json(H), Hospitals),
+    findall(S, facts_shelter_json(S), Shelters),
+    findall(A, facts_ambulance_json(A), Ambulances),
+    findall(R, facts_road_json(R), Roads),
+    facts_scenario_json(Scenario),
+    json_write_dict(
+        current_output,
+        facts_json{
+            scenario:Scenario,
+            zones:Zones,
+            hospitals:Hospitals,
+            shelters:Shelters,
+            ambulances:Ambulances,
+            roads:Roads
+        }
+    ).
+
+facts_scenario_json(Scenario) :-
+    ( scenario_name(Name) -> true ; Name = null ),
+    ( scenario_version(Version) -> true ; Version = null ),
+    ( scenario_description(Description) -> true ; Description = null ),
+    ( current_disaster(Type, Severity) -> true ; Type = null, Severity = null ),
+    Scenario = scenario_json{
+        name:Name,
+        version:Version,
+        description:Description,
+        disaster_type:Type,
+        disaster_severity:Severity
+    }.
+
+facts_zone_json(Zone, Json) :-
+    ( population(Zone, Population) -> true ; Population = null ),
+    ( evacuation_population(Zone, Evacuation) -> true ; Evacuation = null ),
+    (   vulnerable_population(Zone, Children, Elderly, Disabled)
+    ->  true
+    ;   Children = null, Elderly = null, Disabled = null
+    ),
+    (   medical_cases(Zone, Critical, Serious, Minor)
+    ->  true
+    ;   Critical = null, Serious = null, Minor = null
+    ),
+    (   zone_condition(Zone, Risk, Flood, Structural, AtRisk, Urgency)
+    ->  true
+    ;   Risk = null, Flood = null, Structural = null,
+        AtRisk = null, Urgency = null
+    ),
+    (   coordinates(Zone, X, Y)
+    ->  true
+    ;   X = null, Y = null
+    ),
+    Json = zone_facts_json{
+        zone:Zone,
+        population:Population,
+        evacuation_population:Evacuation,
+        children:Children,
+        elderly:Elderly,
+        disabled:Disabled,
+        critical_cases:Critical,
+        serious_cases:Serious,
+        minor_cases:Minor,
+        risk_level:Risk,
+        flood_level:Flood,
+        structural_damage:Structural,
+        population_at_risk:AtRisk,
+        urgency:Urgency,
+        x:X,
+        y:Y
+    }.
+
+facts_hospital_json(Json) :-
+    hospital_state(Name, Zone, Total, Available, Status, Capability),
+    Json = hospital_facts_json{
+        name:Name,
+        zone:Zone,
+        total_capacity:Total,
+        available_capacity:Available,
+        status:Status,
+        capability:Capability
+    }.
+
+facts_shelter_json(Json) :-
+    shelter_state(Name, Zone, Total, Available, Status),
+    (   shelter_features(Name, Medical, Family, Accessibility)
+    ->  true
+    ;   Medical = null, Family = null, Accessibility = null
+    ),
+    Json = shelter_facts_json{
+        name:Name,
+        zone:Zone,
+        total_capacity:Total,
+        available_capacity:Available,
+        status:Status,
+        medical_support:Medical,
+        family_friendly:Family,
+        accessibility_support:Accessibility
+    }.
+
+facts_ambulance_json(Json) :-
+    ambulance_state(Name, Zone, Status, Capability, Capacity),
+    Json = ambulance_facts_json{
+        name:Name,
+        zone:Zone,
+        status:Status,
+        capability:Capability,
+        capacity:Capacity
+    }.
+
+facts_road_json(Json) :-
+    road_state(Name, From, To, Distance, Status, Risk),
+    ( road_capacity(Name, Capacity) -> true ; Capacity = null ),
+    ( road_congestion_factor(Name, Factor) -> true ; Factor = null ),
+    Json = road_facts_json{
+        name:Name,
+        from:From,
+        to:To,
+        distance:Distance,
+        status:Status,
+        risk:Risk,
+        capacity:Capacity,
+        congestion_factor:Factor
+    }.

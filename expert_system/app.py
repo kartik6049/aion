@@ -108,6 +108,11 @@ def get_system():
     return call_engine(engine.get_system)
 
 
+@app.get("/api/facts")
+def get_facts():
+    return call_engine(engine.get_facts)
+
+
 @app.get("/api/resources")
 def get_resources():
     resources = []

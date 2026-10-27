@@ -44,6 +44,20 @@ class BridgeTests(unittest.TestCase):
         self.assertEqual(data["zone"], "Midtown")
         self.assertIn("reasoning", data["explanation"])
 
+    def test_facts_cover_every_zone_and_resource(self):
+        facts = engine.get_facts()
+        plan_zones = [z["zone"] for z in engine.get_plan()["plan"]]
+        self.assertEqual(sorted(z["zone"] for z in facts["zones"]), sorted(plan_zones))
+        for key in ("hospitals", "shelters", "ambulances", "roads"):
+            self.assertTrue(facts[key], key)
+        for zone in facts["zones"]:
+            self.assertNotIn(None, zone.values(), zone["zone"])
+        # every facts value the plan reports must match the stored fact
+        midtown = engine.get_zone("Midtown")["explanation"]["reasoning"]
+        stored = next(z for z in facts["zones"] if z["zone"] == "Midtown")
+        self.assertEqual(midtown["medical"]["critical_cases"], stored["critical_cases"])
+        self.assertEqual(midtown["evacuation"]["people"], stored["evacuation_population"])
+
     def test_unknown_zone_raises_zone_not_found(self):
         with self.assertRaises(engine.ZoneNotFound):
             engine.get_zone("Atlantis")
@@ -85,6 +99,11 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(body["total_zones"], 10)
         self.assertNotIn("explanation", body["plan"][0])
         self.assertIn("priority_score", body["plan"][0])
+
+    def test_facts_endpoint(self):
+        body = self.client.get("/api/facts").json()
+        self.assertEqual(len(body["zones"]), 10)
+        self.assertIn("roads", body)
 
     def test_zone_status_codes(self):
         self.assertEqual(self.client.get("/api/zone/Midtown").status_code, 200)

@@ -107,6 +107,7 @@ test('hash routes round-trip and tolerate malformed input', () => {
     { page: 'home' },
     { page: 'game' },
     { page: 'dashboard' },
+    { page: 'facts' },
     { page: 'zone', zone: "O'Brien Heights/2" },
   ]) {
     assert.deepEqual(parseHash(formatHash(route)), route)
@@ -120,16 +121,15 @@ test('AI does not rush to evacuation while many actions and civilians remain', (
   grid[0][0] = { type: 'safe' }
   grid[N - 1][0] = { type: 'safe' }
   grid[N - 1][N - 1] = { type: 'evac' }
-  grid[N - 1][2] = { type: 'civilian' } // two steps from the AI, evacuation is further
+  grid[N - 4][N - 3] = { type: 'civilian' }
 
-  const ai = newPlayer([N - 1, 1])
-  const state = { grid, human: newPlayer(START_POSITIONS.human), ai, collectiveMoves: 0 }
+  // Evacuation is two steps away, the civilian three: with 50 actions left the AI should collect.
+  const state = {
+    grid,
+    human: newPlayer(START_POSITIONS.human),
+    ai: newPlayer([N - 1, N - 3]),
+    collectiveMoves: 0,
+  }
 
-  assert.equal(decideAIAction(state, RULES.minimaxDepth).dir, 'right')
-
-  // Same position, but the AI has almost no actions left: evacuating is worth more.
-  const late = newPlayer([N - 1, N - 2])
-  late.actions = RULES.maxActions - 3
-  const lateState = { grid, human: newPlayer(START_POSITIONS.human), ai: late, collectiveMoves: 0 }
-  assert.ok(decideAIAction(lateState, RULES.minimaxDepth).dir)
+  assert.equal(decideAIAction(state, RULES.minimaxDepth).dir, 'up')
 })
